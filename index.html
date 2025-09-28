@@ -1,0 +1,308 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Canlı Destek Puanlama • Admin / Operatör / Takipçi</title>
+  <meta name="description" content="Canlı destek personeli puanlama, hata kayıtları ve notlama için hafif bir web uygulaması. GitHub Pages üzerinde çalışır, veriyi Supabase'te tutar." />
+
+  <!-- Tailwind CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: { 50:'#ECFEFF',100:'#CFFAFE',200:'#A5F3FC',300:'#67E8F9',400:'#22D3EE',500:'#06B6D4',600:'#0891B2',700:'#0E7490',800:'#155E75',900:'#164E63' }
+          },
+          boxShadow: {
+            glow: '0 0 0 3px rgb(6 182 212 / 0.25)'
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    :root { color-scheme: dark; }
+    body { background: radial-gradient(1200px 800px at 10% 0%, #0b1220 0%, #0a0f19 40%, #070c14 100%); }
+    .card { @apply bg-slate-900/60 backdrop-blur rounded-2xl border border-white/10 shadow-xl; }
+    .btn { @apply inline-flex items-center justify-center rounded-xl px-4 py-2 font-medium transition; }
+    .btn-primary { @apply bg-brand-500 hover:bg-brand-400 text-slate-900; }
+    .btn-ghost { @apply bg-white/5 hover:bg-white/10 text-white; }
+    .input { @apply w-full rounded-xl bg-white/5 border border-white/10 px-3 py-2 outline-none focus:ring-2 focus:ring-brand-400; }
+    .badge { @apply inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-semibold bg-white/5 border border-white/10; }
+    .kpi-bar { height: 10px; }
+  </style>
+</head>
+<body class="text-slate-100">
+  <!--
+  =====================
+  SUPABASE BİLGİLERİNİ DOLDUR
+  =====================
+  Aşağıdaki iki alanı kendi projenin değerleri ile değiştir:
+   - SUPABASE_URL
+   - SUPABASE_ANON_KEY (Publishable key)
+  -->
+
+  <!-- Top Nav -->
+  <header class="sticky top-0 z-30 border-b border-white/10 bg-slate-950/70 backdrop-blur">
+    <div class="max-w-6xl mx-auto px-4 h-14 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="w-8 h-8 rounded-lg bg-brand-500"></div>
+        <div class="font-semibold">Canlı Destek Puanlama</div>
+        <span id="roleBadge" class="badge hidden"></span>
+      </div>
+      <div class="flex items-center gap-2">
+        <button id="btnSignOut" class="btn btn-ghost hidden">Çıkış</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-6xl mx-auto px-4 py-8 space-y-8">
+
+    <!-- Auth Card -->
+    <section id="authCard" class="card p-6">
+      <h2 class="text-xl font-semibold mb-4">Giriş / Kayıt</h2>
+      <div class="grid md:grid-cols-2 gap-4">
+        <div>
+          <label class="text-sm opacity-80">E‑posta</label>
+          <input id="email" type="email" class="input" placeholder="ornek@firma.com" />
+        </div>
+        <div>
+          <label class="text-sm opacity-80">Şifre</label>
+          <input id="password" type="password" class="input" placeholder="••••••••" />
+        </div>
+      </div>
+      <div class="mt-4 flex gap-2">
+        <button id="btnSignIn" class="btn btn-primary">Giriş Yap</button>
+        <button id="btnSignUp" class="btn btn-ghost">Kayıt Ol</button>
+      </div>
+      <p class="mt-3 text-sm text-amber-300/90">İlk girişte profiliniz otomatik oluşur. Admin, rolünüzü (admin/operator/follower) güncelleyebilir.</p>
+      <p id="authMsg" class="mt-2 text-sm text-rose-300 hidden"></p>
+    </section>
+
+    <!-- Dashboard -->
+    <section id="dash" class="hidden space-y-8">
+      <!-- Profile Summary -->
+      <div class="card p-6">
+        <div class="flex items-center justify-between gap-4">
+          <div class="flex items-center gap-4">
+            <img id="avatar" class="w-14 h-14 rounded-xl border border-white/10" alt="avatar"/>
+            <div>
+              <div id="fullName" class="text-lg font-semibold">—</div>
+              <div id="emailDisplay" class="text-sm opacity-70">—</div>
+            </div>
+          </div>
+          <div class="min-w-[220px]">
+            <div class="flex items-center justify-between text-sm mb-1">
+              <span>Genel Puan</span>
+              <span id="avgScore">0</span>
+            </div>
+            <div class="kpi-bar w-full bg-white/5 rounded-full overflow-hidden border border-white/10">
+              <div id="avgScoreBar" class="h-full bg-brand-500" style="width:0%"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Operator: Yeni Değerlendirme -->
+      <div id="operatorBox" class="card p-6 hidden">
+        <h3 class="text-lg font-semibold mb-4">Yeni Değerlendirme / Not</h3>
+        <div class="grid md:grid-cols-3 gap-4">
+          <div>
+            <label class="text-sm opacity-80">Puan (0–100)</label>
+            <input id="inpScore" type="number" min="0" max="100" class="input" placeholder="85" />
+          </div>
+          <div class="md:col-span-2">
+            <label class="text-sm opacity-80">Not</label>
+            <input id="inpNote" class="input" placeholder="Çağrıda çözüm süresi kısaldı, müşteri memnun ayrıldı." />
+          </div>
+        </div>
+        <div class="mt-4">
+          <label class="text-sm opacity-80">Hatalar (virgülle ayırın)</label>
+          <input id="inpErrors" class="input" placeholder="yanlış yönlendirme, gecikme" />
+        </div>
+        <div class="mt-4">
+          <label class="text-sm opacity-80">Görünürlük</label>
+          <select id="selVisibility" class="input">
+            <option value="team">Ekip (takipçi & operatör görür)</option>
+            <option value="self">Sadece ben</option>
+            <option value="public">Herkes</option>
+          </select>
+        </div>
+        <div class="mt-4 flex gap-2">
+          <button id="btnAddEval" class="btn btn-primary">Kaydet</button>
+          <span id="opMsg" class="text-sm opacity-80"></span>
+        </div>
+      </div>
+
+      <!-- Liste / Filtre -->
+      <div class="card p-6">
+        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+          <h3 class="text-lg font-semibold">Kayıtlar</h3>
+          <div class="flex gap-2">
+            <select id="filterVis" class="input md:w-48">
+              <option value="all">Tümü</option>
+              <option value="team">Ekip</option>
+              <option value="self">Benim</option>
+              <option value="public">Genel</option>
+            </select>
+            <input id="filterText" class="input md:w-64" placeholder="not/hata ara…" />
+            <button id="btnRefresh" class="btn btn-ghost">Yenile</button>
+          </div>
+        </div>
+        <div id="list" class="mt-4 grid gap-3"></div>
+      </div>
+
+      <!-- Admin Paneli -->
+      <div id="adminBox" class="card p-6 hidden">
+        <div class="flex items-center justify-between">
+          <h3 class="text-lg font-semibold">Admin: Kullanıcı & Roller</h3>
+          <button id="btnReloadUsers" class="btn btn-ghost">Yenile</button>
+        </div>
+        <div id="userList" class="mt-4 grid gap-2"></div>
+      </div>
+
+    </section>
+  </main>
+
+  <!-- Supabase CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+  const SUPABASE_URL = "https://swsxpdzjxofajjhlqnsl.supabase.co"; // senin Project URL
+  const SUPABASE_ANON_KEY = "sb_publishable_YotPEZQ6GvplQnOQq-FPNw_HNJ1hMBV"; // senin Publishable key
+  const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  const $ = (sel) => document.querySelector(sel);
+  const listEl = $('#list');
+  const userListEl = $('#userList');
+  const roleBadge = $('#roleBadge');
+  let sessionUser = null;
+  let profile = null;
+
+  function setText(id, text){ const el = document.getElementById(id); if(el) el.textContent = text ?? '—'; }
+  function show(el, v){ el.classList.toggle('hidden', !v); }
+
+  function renderEvalCard(e){
+    const errs = (e.errors||[]).map(x => `<span class="badge">${x}</span>`).join(' ');
+    const d = new Date(e.created_at);
+    return `
+      <div class="p-4 rounded-xl border border-white/10 bg-white/5">
+        <div class="flex items-center justify-between gap-3">
+          <div class="flex items-center gap-3">
+            <span class="badge">Skor: <b>${e.score}</b></span>
+            <span class="badge">Görünürlük: ${e.visibility}</span>
+            <span class="text-xs opacity-70">${d.toLocaleString()}</span>
+          </div>
+          ${profile?.role === 'admin' ? `<button data-id="${e.id}" class="btn btn-ghost text-xs border border-white/10 admin-del">Sil</button>`: ''}
+        </div>
+        <div class="mt-2 text-sm">${e.note ?? ''}</div>
+        <div class="mt-2 flex flex-wrap gap-2">${errs}</div>
+      </div>
+    `;
+  }
+
+  function updateKPI(avg){
+    setText('avgScore', Math.round(avg||0));
+    $('#avgScoreBar').style.width = `${Math.max(0, Math.min(100, avg||0))}%`;
+  }
+
+  async function computeAvgScore(){
+    if(!profile) return 0;
+    let q = sb.from('evaluations').select('score');
+    if(profile.role === 'operator'){
+      q = q.eq('operator_id', sessionUser.id);
+    } else {
+      q = q.in('visibility', ['team','public']);
+    }
+    const { data, error } = await q; if(error) return 0;
+    const arr = (data||[]).map(x=>x.score);
+    const avg = arr.length ? arr.reduce((a,b)=>a+b,0)/arr.length : 0;
+    updateKPI(avg);
+    return avg;
+  }
+
+  async function ensureProfile(user){
+    const { data: exists } = await sb.from('profiles').select('id, full_name, role, avatar_url').eq('id', user.id).maybeSingle();
+    if(!exists){
+      await sb.from('profiles').insert({ id: user.id, full_name: user.email.split('@')[0], role: 'operator' });
+    }
+    const { data } = await sb.from('profiles').select('*').eq('id', user.id).single();
+    profile = data;
+    setText('fullName', profile.full_name||'—');
+    setText('emailDisplay', user.email);
+    $('#avatar').src = profile.avatar_url || `https://api.dicebear.com/8.x/thumbs/svg?seed=${encodeURIComponent(profile.full_name||'user')}`;
+    roleBadge.textContent = profile.role.toUpperCase();
+    show(roleBadge, true);
+
+    show($('#operatorBox'), profile.role === 'operator' || profile.role === 'admin');
+    show($('#adminBox'), profile.role === 'admin');
+  }
+
+  async function onAuthChanged(){
+    const { data: { user } } = await sb.auth.getUser();
+    sessionUser = user;
+    show($('#authCard'), !user);
+    show($('#dash'), !!user);
+    show($('#btnSignOut'), !!user);
+    if(user){
+      await ensureProfile(user);
+      await computeAvgScore();
+      await loadEvaluations();
+      if(profile.role === 'admin') await loadUsers();
+    }
+  }
+
+  async function loadEvaluations(){
+    let q = sb.from('evaluations').select('*').order('created_at', { ascending:false }).limit(100);
+    const vis = $('#filterVis').value;
+    const search = $('#filterText').value?.trim();
+
+    if(profile.role === 'operator'){
+      if(vis === 'self') q = q.eq('operator_id', sessionUser.id);
+      if(vis === 'team') q = q.eq('visibility','team');
+      if(vis === 'public') q = q.eq('visibility','public');
+    } else if(profile.role === 'follower'){
+      if(vis === 'self') { q = q.eq('visibility','team'); }
+      if(vis === 'team') q = q.eq('visibility','team');
+      if(vis === 'public') q = q.eq('visibility','public');
+    } else {
+      if(vis === 'team') q = q.eq('visibility','team');
+      if(vis === 'self') q = q.eq('operator_id', sessionUser.id);
+      if(vis === 'public') q = q.eq('visibility','public');
+    }
+
+    if(search){
+      const { data, error } = await q; if(error){ listEl.innerHTML = `<div class='text-rose-300'>${error.message}</div>`; return; }
+      const s = search.toLowerCase();
+      const filtered = (data||[]).filter(e =>
+        (e.note||'').toLowerCase().includes(s) || (e.errors||[]).join(',').toLowerCase().includes(s)
+      );
+      listEl.innerHTML = filtered.map(renderEvalCard).join('');
+      bindAdminDelete();
+      return;
+    }
+
+    const { data, error } = await q; if(error){ listEl.innerHTML = `<div class='text-rose-300'>${error.message}</div>`; return; }
+    listEl.innerHTML = (data||[]).map(renderEvalCard).join('');
+    bindAdminDelete();
+  }
+
+  function bindAdminDelete(){
+    document.querySelectorAll('.admin-del').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        const id = btn.getAttribute('data-id');
+        if(!confirm('Kaydı silmek istiyor musunuz?')) return;
+        const { error } = await sb.from('evaluations').delete().eq('id', id);
+        if(!error){ await loadEvaluations(); await computeAvgScore(); }
+      });
+    });
+  }
+
+  async function addEvaluation(){
+    const score = parseInt($('#inpScore').value, 10);
+    const note = $('#inpNote').value.trim();
+    const errors = $('#inpErrors').value.split(',').map(s=>s.trim()).filter(Boolean);
+    const visibility = $('#selVisibility').value;
+    if(Number.isNaN(score) || score<0 || score>100){ $('#opMsg').textContent
