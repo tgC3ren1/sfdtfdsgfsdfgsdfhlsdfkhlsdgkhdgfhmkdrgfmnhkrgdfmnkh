@@ -1,308 +1,283 @@
 <!doctype html>
 <html lang="tr">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Canlı Destek Puanlama • Admin / Operatör / Takipçi</title>
-  <meta name="description" content="Canlı destek personeli puanlama, hata kayıtları ve notlama için hafif bir web uygulaması. GitHub Pages üzerinde çalışır, veriyi Supabase'te tutar." />
-
-  <!-- Tailwind CDN -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Canlı Destek Puanlama</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: {
-            brand: { 50:'#ECFEFF',100:'#CFFAFE',200:'#A5F3FC',300:'#67E8F9',400:'#22D3EE',500:'#06B6D4',600:'#0891B2',700:'#0E7490',800:'#155E75',900:'#164E63' }
-          },
-          boxShadow: {
-            glow: '0 0 0 3px rgb(6 182 212 / 0.25)'
-          }
-        }
-      }
-    }
-  </script>
-
   <style>
-    :root { color-scheme: dark; }
-    body { background: radial-gradient(1200px 800px at 10% 0%, #0b1220 0%, #0a0f19 40%, #070c14 100%); }
-    .card { @apply bg-slate-900/60 backdrop-blur rounded-2xl border border-white/10 shadow-xl; }
-    .btn { @apply inline-flex items-center justify-center rounded-xl px-4 py-2 font-medium transition; }
-    .btn-primary { @apply bg-brand-500 hover:bg-brand-400 text-slate-900; }
-    .btn-ghost { @apply bg-white/5 hover:bg-white/10 text-white; }
-    .input { @apply w-full rounded-xl bg-white/5 border border-white/10 px-3 py-2 outline-none focus:ring-2 focus:ring-brand-400; }
-    .badge { @apply inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-semibold bg-white/5 border border-white/10; }
-    .kpi-bar { height: 10px; }
+    :root { color-scheme: dark }
+    html,body{height:100%}
+    body{
+      margin:0; font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial;
+      background:
+        radial-gradient(1200px 600px at 10% -10%, rgba(37,255,230,.08), transparent 60%),
+        radial-gradient(900px 500px at 100% 0%, rgba(13,197,255,.08), transparent 50%),
+        #0a0f1e;
+      color:#e9eef5
+    }
+    .card{background:#0f172a; border:1px solid #1f2a44; border-radius:16px; box-shadow:0 12px 36px rgba(0,0,0,.35)}
+    .input{background:#0b1430; border:1px solid #243055; border-radius:12px; padding:.9rem 1rem; width:100%}
+    .input:focus{outline:2px solid #0DC5FF; border-color:#0DC5FF}
+    .btn{padding:.85rem 1rem; border-radius:12px; font-weight:700}
+    .btn-primary{background:#0DC5FF}
+    .btn-ghost{border:1px solid #2a3658}
+    .badge{padding:.25rem .55rem; border-radius:.5rem; font-size:.75rem; font-weight:700; border:1px solid rgba(255,255,255,.12)}
+    .badge-admin{background:rgba(255,193,7,.12); color:#ffc107}
+    .badge-operator{background:rgba(13,197,255,.12); color:#0DC5FF}
+    .badge-follower{background:rgba(37,255,230,.12); color:#25FFE6}
   </style>
 </head>
-<body class="text-slate-100">
-  <!--
-  =====================
-  SUPABASE BİLGİLERİNİ DOLDUR
-  =====================
-  Aşağıdaki iki alanı kendi projenin değerleri ile değiştir:
-   - SUPABASE_URL
-   - SUPABASE_ANON_KEY (Publishable key)
-  -->
-
-  <!-- Top Nav -->
-  <header class="sticky top-0 z-30 border-b border-white/10 bg-slate-950/70 backdrop-blur">
-    <div class="max-w-6xl mx-auto px-4 h-14 flex items-center justify-between">
+<body>
+  <!-- Header -->
+  <header class="border-b border-[#1f2a44]">
+    <div class="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
       <div class="flex items-center gap-3">
-        <div class="w-8 h-8 rounded-lg bg-brand-500"></div>
-        <div class="font-semibold">Canlı Destek Puanlama</div>
-        <span id="roleBadge" class="badge hidden"></span>
+        <div class="w-6 h-6 rounded-md" style="background:linear-gradient(135deg,#25FFE6,#0DC5FF)"></div>
+        <div>
+          <h1 class="text-lg font-extrabold tracking-tight">Canlı Destek Puanlama</h1>
+          <p class="text-xs opacity-60 -mt-1">Giriş yap, profilin otomatik oluşsun.</p>
+        </div>
       </div>
-      <div class="flex items-center gap-2">
-        <button id="btnSignOut" class="btn btn-ghost hidden">Çıkış</button>
+      <div id="user-chip" class="hidden items-center gap-3">
+        <span id="chip-email" class="text-sm opacity-90"></span>
+        <span id="chip-role" class="badge"></span>
+        <button id="btn-logout" class="btn btn-ghost text-sm">Çıkış</button>
       </div>
     </div>
   </header>
 
-  <main class="max-w-6xl mx-auto px-4 py-8 space-y-8">
+  <!-- Main -->
+  <main class="max-w-6xl mx-auto px-6 py-10">
+    <div id="auth-card" class="card p-8 max-w-xl mx-auto">
+      <div class="flex gap-2 mb-6">
+        <button id="tab-login" class="btn btn-ghost w-1/2 font-semibold">Giriş Yap</button>
+        <button id="tab-register" class="btn btn-ghost w-1/2 font-semibold opacity-70">Kayıt Ol</button>
+      </div>
 
-    <!-- Auth Card -->
-    <section id="authCard" class="card p-6">
-      <h2 class="text-xl font-semibold mb-4">Giriş / Kayıt</h2>
-      <div class="grid md:grid-cols-2 gap-4">
+      <form id="form-login" class="space-y-5">
         <div>
-          <label class="text-sm opacity-80">E‑posta</label>
-          <input id="email" type="email" class="input" placeholder="ornek@firma.com" />
+          <label class="block mb-2 text-sm opacity-80">E-posta</label>
+          <input id="login-email" type="email" required placeholder="ornek@mail.com" class="input">
         </div>
         <div>
-          <label class="text-sm opacity-80">Şifre</label>
-          <input id="password" type="password" class="input" placeholder="••••••••" />
+          <label class="block mb-2 text-sm opacity-80">Şifre</label>
+          <div class="relative">
+            <input id="login-password" type="password" minlength="6" required placeholder="••••••" class="input pr-12">
+            <button type="button" id="toggle-login-pass" class="absolute right-2 top-1/2 -translate-y-1/2 text-xs opacity-70">Göster</button>
+          </div>
         </div>
-      </div>
-      <div class="mt-4 flex gap-2">
-        <button id="btnSignIn" class="btn btn-primary">Giriş Yap</button>
-        <button id="btnSignUp" class="btn btn-ghost">Kayıt Ol</button>
-      </div>
-      <p class="mt-3 text-sm text-amber-300/90">İlk girişte profiliniz otomatik oluşur. Admin, rolünüzü (admin/operator/follower) güncelleyebilir.</p>
-      <p id="authMsg" class="mt-2 text-sm text-rose-300 hidden"></p>
-    </section>
+        <button class="btn btn-primary w-full">Giriş Yap</button>
+        <p class="text-yellow-300/90 text-sm">İlk girişte profiliniz otomatik oluşur. Admin, rolünüzü (admin / operator / follower) güncelleyebilir.</p>
+        <p id="msg-login" class="text-sm mt-1 opacity-90"></p>
+      </form>
+
+      <form id="form-register" class="space-y-5 hidden">
+        <div>
+          <label class="block mb-2 text-sm opacity-80">E-posta</label>
+          <input id="reg-email" type="email" required placeholder="ornek@mail.com" class="input">
+        </div>
+        <div>
+          <label class="block mb-2 text-sm opacity-80">Şifre</label>
+          <div class="relative">
+            <input id="reg-password" type="password" minlength="6" required placeholder="••••••" class="input pr-12">
+            <button type="button" id="toggle-reg-pass" class="absolute right-2 top-1/2 -translate-y-1/2 text-xs opacity-70">Göster</button>
+          </div>
+        </div>
+        <button class="btn btn-primary w-full">Kayıt Ol</button>
+        <p id="msg-register" class="text-sm mt-1 opacity-90"></p>
+      </form>
+    </div>
 
     <!-- Dashboard -->
-    <section id="dash" class="hidden space-y-8">
-      <!-- Profile Summary -->
-      <div class="card p-6">
-        <div class="flex items-center justify-between gap-4">
-          <div class="flex items-center gap-4">
-            <img id="avatar" class="w-14 h-14 rounded-xl border border-white/10" alt="avatar"/>
-            <div>
-              <div id="fullName" class="text-lg font-semibold">—</div>
-              <div id="emailDisplay" class="text-sm opacity-70">—</div>
-            </div>
-          </div>
-          <div class="min-w-[220px]">
-            <div class="flex items-center justify-between text-sm mb-1">
-              <span>Genel Puan</span>
-              <span id="avgScore">0</span>
-            </div>
-            <div class="kpi-bar w-full bg-white/5 rounded-full overflow-hidden border border-white/10">
-              <div id="avgScoreBar" class="h-full bg-brand-500" style="width:0%"></div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Operator: Yeni Değerlendirme -->
-      <div id="operatorBox" class="card p-6 hidden">
-        <h3 class="text-lg font-semibold mb-4">Yeni Değerlendirme / Not</h3>
-        <div class="grid md:grid-cols-3 gap-4">
+    <section id="app" class="hidden grid lg:grid-cols-3 gap-6">
+      <!-- Left: Profile -->
+      <div class="card p-6 lg:col-span-1">
+        <div class="flex items-start justify-between">
           <div>
-            <label class="text-sm opacity-80">Puan (0–100)</label>
-            <input id="inpScore" type="number" min="0" max="100" class="input" placeholder="85" />
+            <h3 class="text-xl font-bold">Profil</h3>
+            <p class="text-sm opacity-70">Kullanıcı bilgilerin</p>
           </div>
-          <div class="md:col-span-2">
-            <label class="text-sm opacity-80">Not</label>
-            <input id="inpNote" class="input" placeholder="Çağrıda çözüm süresi kısaldı, müşteri memnun ayrıldı." />
-          </div>
+          <span id="role-badge" class="badge">role</span>
         </div>
-        <div class="mt-4">
-          <label class="text-sm opacity-80">Hatalar (virgülle ayırın)</label>
-          <input id="inpErrors" class="input" placeholder="yanlış yönlendirme, gecikme" />
-        </div>
-        <div class="mt-4">
-          <label class="text-sm opacity-80">Görünürlük</label>
-          <select id="selVisibility" class="input">
-            <option value="team">Ekip (takipçi & operatör görür)</option>
-            <option value="self">Sadece ben</option>
-            <option value="public">Herkes</option>
-          </select>
-        </div>
-        <div class="mt-4 flex gap-2">
-          <button id="btnAddEval" class="btn btn-primary">Kaydet</button>
-          <span id="opMsg" class="text-sm opacity-80"></span>
+        <div class="mt-4 space-y-2 text-sm">
+          <div class="opacity-70">E-posta</div>
+          <div id="profile-email" class="font-semibold"></div>
+          <div class="opacity-70 pt-3">Kullanıcı ID</div>
+          <div id="profile-id" class="font-mono text-xs break-all opacity-90"></div>
+          <div class="opacity-70 pt-3">Oluşturulma</div>
+          <div id="profile-created" class="opacity-90"></div>
         </div>
       </div>
 
-      <!-- Liste / Filtre -->
-      <div class="card p-6">
-        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
-          <h3 class="text-lg font-semibold">Kayıtlar</h3>
-          <div class="flex gap-2">
-            <select id="filterVis" class="input md:w-48">
-              <option value="all">Tümü</option>
-              <option value="team">Ekip</option>
-              <option value="self">Benim</option>
-              <option value="public">Genel</option>
+      <!-- Middle: Quick actions -->
+      <div class="card p-6 lg:col-span-2">
+        <h3 class="text-xl font-bold mb-2">Hızlı İşlemler</h3>
+        <p class="text-sm opacity-70 mb-6">Buraya daha sonra “puanlama”, “operatör profilleri”, “raporlar” gibi modülleri ekleyebiliriz.</p>
+
+        <div id="admin-tools" class="hidden">
+          <h4 class="font-semibold mb-2">Admin: Rol Atama</h4>
+          <div class="grid md:grid-cols-[1fr_180px_120px] gap-3">
+            <input id="adm-email" type="email" placeholder="kisi@ornek.com" class="input">
+            <select id="adm-role" class="input">
+              <option value="admin">admin</option>
+              <option value="operator">operator</option>
+              <option value="follower">follower</option>
             </select>
-            <input id="filterText" class="input md:w-64" placeholder="not/hata ara…" />
-            <button id="btnRefresh" class="btn btn-ghost">Yenile</button>
+            <button id="adm-apply" class="btn btn-ghost">Uygula</button>
           </div>
+          <p id="msg-admin" class="text-sm opacity-90 mt-2"></p>
+          <hr class="border-[#1f2a44] my-6">
         </div>
-        <div id="list" class="mt-4 grid gap-3"></div>
-      </div>
 
-      <!-- Admin Paneli -->
-      <div id="adminBox" class="card p-6 hidden">
-        <div class="flex items-center justify-between">
-          <h3 class="text-lg font-semibold">Admin: Kullanıcı & Roller</h3>
-          <button id="btnReloadUsers" class="btn btn-ghost">Yenile</button>
+        <div class="grid md:grid-cols-2 gap-4">
+          <button id="btn-refresh" class="btn btn-ghost">Profili Yenile</button>
+          <button id="btn-signout" class="btn btn-ghost">Güvenli Çıkış</button>
         </div>
-        <div id="userList" class="mt-4 grid gap-2"></div>
       </div>
-
     </section>
   </main>
 
-  <!-- Supabase CDN -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <!-- Supabase -->
+  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
   <script>
-  const SUPABASE_URL = "https://swsxpdzjxofajjhlqnsl.supabase.co"; // senin Project URL
-  const SUPABASE_ANON_KEY = "sb_publishable_YotPEZQ6GvplQnOQq-FPNw_HNJ1hMBV"; // senin Publishable key
-  const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-  const $ = (sel) => document.querySelector(sel);
-  const listEl = $('#list');
-  const userListEl = $('#userList');
-  const roleBadge = $('#roleBadge');
-  let sessionUser = null;
-  let profile = null;
-
-  function setText(id, text){ const el = document.getElementById(id); if(el) el.textContent = text ?? '—'; }
-  function show(el, v){ el.classList.toggle('hidden', !v); }
-
-  function renderEvalCard(e){
-    const errs = (e.errors||[]).map(x => `<span class="badge">${x}</span>`).join(' ');
-    const d = new Date(e.created_at);
-    return `
-      <div class="p-4 rounded-xl border border-white/10 bg-white/5">
-        <div class="flex items-center justify-between gap-3">
-          <div class="flex items-center gap-3">
-            <span class="badge">Skor: <b>${e.score}</b></span>
-            <span class="badge">Görünürlük: ${e.visibility}</span>
-            <span class="text-xs opacity-70">${d.toLocaleString()}</span>
-          </div>
-          ${profile?.role === 'admin' ? `<button data-id="${e.id}" class="btn btn-ghost text-xs border border-white/10 admin-del">Sil</button>`: ''}
-        </div>
-        <div class="mt-2 text-sm">${e.note ?? ''}</div>
-        <div class="mt-2 flex flex-wrap gap-2">${errs}</div>
-      </div>
-    `;
-  }
-
-  function updateKPI(avg){
-    setText('avgScore', Math.round(avg||0));
-    $('#avgScoreBar').style.width = `${Math.max(0, Math.min(100, avg||0))}%`;
-  }
-
-  async function computeAvgScore(){
-    if(!profile) return 0;
-    let q = sb.from('evaluations').select('score');
-    if(profile.role === 'operator'){
-      q = q.eq('operator_id', sessionUser.id);
-    } else {
-      q = q.in('visibility', ['team','public']);
-    }
-    const { data, error } = await q; if(error) return 0;
-    const arr = (data||[]).map(x=>x.score);
-    const avg = arr.length ? arr.reduce((a,b)=>a+b,0)/arr.length : 0;
-    updateKPI(avg);
-    return avg;
-  }
-
-  async function ensureProfile(user){
-    const { data: exists } = await sb.from('profiles').select('id, full_name, role, avatar_url').eq('id', user.id).maybeSingle();
-    if(!exists){
-      await sb.from('profiles').insert({ id: user.id, full_name: user.email.split('@')[0], role: 'operator' });
-    }
-    const { data } = await sb.from('profiles').select('*').eq('id', user.id).single();
-    profile = data;
-    setText('fullName', profile.full_name||'—');
-    setText('emailDisplay', user.email);
-    $('#avatar').src = profile.avatar_url || `https://api.dicebear.com/8.x/thumbs/svg?seed=${encodeURIComponent(profile.full_name||'user')}`;
-    roleBadge.textContent = profile.role.toUpperCase();
-    show(roleBadge, true);
-
-    show($('#operatorBox'), profile.role === 'operator' || profile.role === 'admin');
-    show($('#adminBox'), profile.role === 'admin');
-  }
-
-  async function onAuthChanged(){
-    const { data: { user } } = await sb.auth.getUser();
-    sessionUser = user;
-    show($('#authCard'), !user);
-    show($('#dash'), !!user);
-    show($('#btnSignOut'), !!user);
-    if(user){
-      await ensureProfile(user);
-      await computeAvgScore();
-      await loadEvaluations();
-      if(profile.role === 'admin') await loadUsers();
-    }
-  }
-
-  async function loadEvaluations(){
-    let q = sb.from('evaluations').select('*').order('created_at', { ascending:false }).limit(100);
-    const vis = $('#filterVis').value;
-    const search = $('#filterText').value?.trim();
-
-    if(profile.role === 'operator'){
-      if(vis === 'self') q = q.eq('operator_id', sessionUser.id);
-      if(vis === 'team') q = q.eq('visibility','team');
-      if(vis === 'public') q = q.eq('visibility','public');
-    } else if(profile.role === 'follower'){
-      if(vis === 'self') { q = q.eq('visibility','team'); }
-      if(vis === 'team') q = q.eq('visibility','team');
-      if(vis === 'public') q = q.eq('visibility','public');
-    } else {
-      if(vis === 'team') q = q.eq('visibility','team');
-      if(vis === 'self') q = q.eq('operator_id', sessionUser.id);
-      if(vis === 'public') q = q.eq('visibility','public');
-    }
-
-    if(search){
-      const { data, error } = await q; if(error){ listEl.innerHTML = `<div class='text-rose-300'>${error.message}</div>`; return; }
-      const s = search.toLowerCase();
-      const filtered = (data||[]).filter(e =>
-        (e.note||'').toLowerCase().includes(s) || (e.errors||[]).join(',').toLowerCase().includes(s)
-      );
-      listEl.innerHTML = filtered.map(renderEvalCard).join('');
-      bindAdminDelete();
-      return;
-    }
-
-    const { data, error } = await q; if(error){ listEl.innerHTML = `<div class='text-rose-300'>${error.message}</div>`; return; }
-    listEl.innerHTML = (data||[]).map(renderEvalCard).join('');
-    bindAdminDelete();
-  }
-
-  function bindAdminDelete(){
-    document.querySelectorAll('.admin-del').forEach(btn => {
-      btn.addEventListener('click', async () => {
-        const id = btn.getAttribute('data-id');
-        if(!confirm('Kaydı silmek istiyor musunuz?')) return;
-        const { error } = await sb.from('evaluations').delete().eq('id', id);
-        if(!error){ await loadEvaluations(); await computeAvgScore(); }
-      });
+    // === Supabase config (Senin verdiğin değerlerle dolduruldu) ===
+    const SUPABASE_URL = "https://swsxpdzjxofajjhlqnsl.supabase.co";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN3c3hwZHpqeG9mYWpqaGxxbnNsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTkwNzY1MzUsImV4cCI6MjA3NDY1MjUzNX0.nD4qPHLk35pX7MlirXLNkfSbjdyd4ac5iuzY-hiGL5I";
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+      auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true }
     });
-  }
 
-  async function addEvaluation(){
-    const score = parseInt($('#inpScore').value, 10);
-    const note = $('#inpNote').value.trim();
-    const errors = $('#inpErrors').value.split(',').map(s=>s.trim()).filter(Boolean);
-    const visibility = $('#selVisibility').value;
-    if(Number.isNaN(score) || score<0 || score>100){ $('#opMsg').textContent
+    // === UI helpers ===
+    const $ = s => document.querySelector(s);
+    const show = (el, flag) => el.classList.toggle('hidden', !flag);
+    const setText = (el, txt) => el.textContent = txt ?? '';
+
+    // Tabs
+    const tabLogin = $('#tab-login'), tabRegister = $('#tab-register');
+    const formLogin = $('#form-login'), formRegister = $('#form-register');
+    tabLogin.onclick = () => { tabLogin.classList.remove('opacity-70'); tabRegister.classList.add('opacity-70'); show(formLogin,true); show(formRegister,false); }
+    tabRegister.onclick = () => { tabRegister.classList.remove('opacity-70'); tabLogin.classList.add('opacity-70'); show(formLogin,false); show(formRegister,true); }
+
+    // Password toggles
+    $('#toggle-login-pass').onclick = () => {
+      const i = $('#login-password'); i.type = i.type === 'password' ? 'text' : 'password';
+      $('#toggle-login-pass').textContent = i.type === 'password' ? 'Göster' : 'Gizle';
+    };
+    $('#toggle-reg-pass').onclick = () => {
+      const i = $('#reg-password'); i.type = i.type === 'password' ? 'text' : 'password';
+      $('#toggle-reg-pass').textContent = i.type === 'password' ? 'Göster' : 'Gizle';
+    };
+
+    // Auth DOM
+    const authCard = $('#auth-card');
+    const app = $('#app');
+    const userChip = $('#user-chip');
+    const chipEmail = $('#chip-email');
+    const chipRole = $('#chip-role');
+    const roleBadge = $('#role-badge');
+    const msgLogin = $('#msg-login');
+    const msgRegister = $('#msg-register');
+
+    // Load profile
+    async function loadProfile() {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+      setText(chipEmail, user.email);
+      $('#profile-email').textContent = user.email;
+      $('#profile-id').textContent = user.id;
+      // get profile row
+      const { data, error } = await supabase.from('profiles')
+        .select('id,email,role,created_at')
+        .eq('id', user.id)
+        .single();
+      if (error) {
+        chipRole.className = 'badge';
+        chipRole.textContent = 'profil yok';
+        roleBadge.className = 'badge';
+        roleBadge.textContent = 'profil yok';
+        return;
+      }
+      const role = (data.role || 'follower');
+      const created = new Date(data.created_at).toLocaleString();
+      $('#profile-created').textContent = created;
+
+      // badges
+      const roleClass = role === 'admin' ? 'badge-admin' : role === 'operator' ? 'badge-operator' : 'badge-follower';
+      chipRole.className = `badge ${roleClass}`;
+      roleBadge.className = `badge ${roleClass}`;
+      chipRole.textContent = role;
+      roleBadge.textContent = role;
+
+      // admin tools
+      show($('#admin-tools'), role === 'admin');
+    }
+
+    // Login
+    formLogin.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      setText(msgLogin, 'Giriş yapılıyor…');
+      const email = $('#login-email').value.trim();
+      const password = $('#login-password').value;
+      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+      if (error) {
+        if (error.message.includes('Invalid login credentials')) {
+          setText(msgLogin, 'Bilgiler hatalı. Kayıt sekmesinden yeni hesap oluşturabilirsiniz.');
+        } else {
+          setText(msgLogin, 'Giriş hatası: ' + error.message);
+        }
+        return;
+      }
+      setText(msgLogin, 'Giriş başarılı.');
+      show(authCard, false); show(app, true); show(userChip, true);
+      await loadProfile();
+    });
+
+    // Register
+    formRegister.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      setText(msgRegister, 'Kayıt oluşturuluyor…');
+      const email = $('#reg-email').value.trim();
+      const password = $('#reg-password').value;
+      const { data, error } = await supabase.auth.signUp({ email, password });
+      if (error) { setText(msgRegister, 'Kayıt hatası: ' + error.message); return; }
+      setText(msgRegister, 'Kayıt başarılı. E-posta doğrulaması gerekebilir. Giriş sekmesinden devam edin.');
+    });
+
+    // Global sign out buttons
+    $('#btn-signout').onclick = $('#btn-logout').onclick = async () => {
+      await supabase.auth.signOut(); location.reload();
+    };
+
+    // Admin: role assign
+    $('#adm-apply').onclick = async () => {
+      const email = $('#adm-email').value.trim();
+      const role = $('#adm-role').value;
+      const msg = $('#msg-admin');
+      msg.textContent = 'Uygulanıyor…';
+      // find profile by email
+      const { data: prof, error: e1 } = await supabase.from('profiles').select('id,email').eq('email', email).single();
+      if (e1) { msg.textContent = 'Bulunamadı: ' + e1.message; return; }
+      const { error: e2 } = await supabase.from('profiles').update({ role }).eq('id', prof.id);
+      msg.textContent = e2 ? ('Hata: ' + e2.message) : 'Rol güncellendi ✅';
+    };
+
+    // Refresh
+    $('#btn-refresh').onclick = loadProfile;
+
+    // On page load: session?
+    supabase.auth.onAuthStateChange(async (_event, session) => {
+      if (session) {
+        show(authCard, false); show(app, true); show(userChip, true);
+        await loadProfile();
+      }
+    });
+    (async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) { show(authCard, false); show(app, true); show(userChip, true); loadProfile(); }
+    })();
+  </script>
+</body>
+</html>
