@@ -11,7 +11,7 @@
     :root { color-scheme: dark }
     html,body{height:100%}
     body{
-      margin:0; font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial;
+      margin:0; font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial;
       background:
         radial-gradient(1200px 600px at 10% -10%, rgba(37,255,230,.08), transparent 60%),
         radial-gradient(900px 500px at 100% 0%, rgba(13,197,255,.08), transparent 50%),
@@ -28,12 +28,14 @@
     .badge-admin{background:rgba(255,193,7,.12); color:#ffc107}
     .badge-operator{background:rgba(13,197,255,.12); color:#0DC5FF}
     .badge-follower{background:rgba(37,255,230,.12); color:#25FFE6}
+    table thead th{font-weight:600}
+    table td, table th{padding:.5rem .25rem}
   </style>
 </head>
 <body>
   <!-- Header -->
   <header class="border-b border-[#1f2a44]">
-    <div class="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
+    <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
       <div class="flex items-center gap-3">
         <div class="w-6 h-6 rounded-md" style="background:linear-gradient(135deg,#25FFE6,#0DC5FF)"></div>
         <div>
@@ -43,14 +45,14 @@
       </div>
       <div id="user-chip" class="hidden items-center gap-3">
         <span id="chip-email" class="text-sm opacity-90"></span>
-        <span id="chip-role" class="badge"></span>
+        <span id="chip-role" class="badge">role</span>
         <button id="btn-logout" class="btn btn-ghost text-sm">Çıkış</button>
       </div>
     </div>
   </header>
 
-  <!-- Main -->
-  <main class="max-w-6xl mx-auto px-6 py-10">
+  <!-- Auth -->
+  <main class="max-w-7xl mx-auto px-6 py-10">
     <div id="auth-card" class="card p-8 max-w-xl mx-auto">
       <div class="flex gap-2 mb-6">
         <button id="tab-login" class="btn btn-ghost w-1/2 font-semibold">Giriş Yap</button>
@@ -70,7 +72,7 @@
           </div>
         </div>
         <button class="btn btn-primary w-full">Giriş Yap</button>
-        <p class="text-yellow-300/90 text-sm">İlk girişte profiliniz otomatik oluşur. Admin, rolünüzü (admin / operator / follower) güncelleyebilir.</p>
+        <p class="text-yellow-300/90 text-sm">İlk girişte profiliniz otomatik oluşur.</p>
         <p id="msg-login" class="text-sm mt-1 opacity-90"></p>
       </form>
 
@@ -91,9 +93,9 @@
       </form>
     </div>
 
-    <!-- Dashboard -->
+    <!-- App -->
     <section id="app" class="hidden grid lg:grid-cols-3 gap-6">
-      <!-- Left: Profile -->
+      <!-- Profile -->
       <div class="card p-6 lg:col-span-1">
         <div class="flex items-start justify-between">
           <div>
@@ -104,7 +106,7 @@
         </div>
         <div class="mt-4 space-y-2 text-sm">
           <div class="opacity-70">E-posta</div>
-          <div id="profile-email" class="font-semibold"></div>
+          <div id="profile-email" class="font-semibold break-all"></div>
           <div class="opacity-70 pt-3">Kullanıcı ID</div>
           <div id="profile-id" class="font-mono text-xs break-all opacity-90"></div>
           <div class="opacity-70 pt-3">Oluşturulma</div>
@@ -112,12 +114,14 @@
         </div>
       </div>
 
-      <!-- Middle: Quick actions -->
+      <!-- Admin/Operator Workspace -->
       <div class="card p-6 lg:col-span-2">
-        <h3 class="text-xl font-bold mb-2">Hızlı İşlemler</h3>
-        <p class="text-sm opacity-70 mb-6">Buraya daha sonra “puanlama”, “operatör profilleri”, “raporlar” gibi modülleri ekleyebiliriz.</p>
+        <h3 class="text-xl font-bold mb-2">İş Alanı</h3>
+        <p class="text-sm opacity-70 mb-4">Admin isen alttaki araçlar aktif olur. Operatörsen kendi KPI’larını görürsün.</p>
 
+        <!-- ADMIN TOOLS -->
         <div id="admin-tools" class="hidden">
+          <!-- Role assign -->
           <h4 class="font-semibold mb-2">Admin: Rol Atama</h4>
           <div class="grid md:grid-cols-[1fr_180px_120px] gap-3">
             <input id="adm-email" type="email" placeholder="kisi@ornek.com" class="input">
@@ -129,31 +133,118 @@
             <button id="adm-apply" class="btn btn-ghost">Uygula</button>
           </div>
           <p id="msg-admin" class="text-sm opacity-90 mt-2"></p>
-          <hr class="border-[#1f2a44] my-6">
+
+          <!-- SLA settings -->
+          <h4 class="font-semibold mt-6 mb-2">SLA Hedefleri (FRT/TTR)</h4>
+          <div class="grid md:grid-cols-[1fr_1fr_120px] gap-3">
+            <input id="sla-frt" type="number" class="input" placeholder="FRT hedefi (sn)">
+            <input id="sla-ttr" type="number" class="input" placeholder="TTR hedefi (sn)">
+            <button id="sla-save" class="btn btn-ghost">Kaydet</button>
+          </div>
+          <p id="msg-sla" class="text-sm opacity-90 mt-2"></p>
+
+          <!-- Quick ticket create -->
+          <h4 class="font-semibold mt-6 mb-2">Ticket Oluştur (Hızlı Test)</h4>
+          <div class="grid md:grid-cols-2 gap-3">
+            <input id="tc-operator-email" class="input" placeholder="Operatör e-postası">
+            <select id="tc-status" class="input">
+              <option value="open">open</option>
+              <option value="pending">pending</option>
+              <option value="resolved">resolved</option>
+              <option value="closed">closed</option>
+            </select>
+            <input id="tc-channel" class="input" placeholder="Kanal (livechat/telegram)">
+            <input id="tc-tags" class="input" placeholder="Etiketler (virgülle)">
+            <button id="tc-create" class="btn btn-ghost">Ticket Oluştur</button>
+          </div>
+          <p id="msg-ticket" class="text-sm opacity-90 mt-2"></p>
+
+          <!-- Rate form -->
+          <h4 class="font-semibold mt-6 mb-2">Puan Ver (Baremli)</h4>
+          <div class="grid md:grid-cols-2 gap-3">
+            <input id="rv-operator-email" class="input" placeholder="Operatör e-postası">
+            <input id="rv-ticket-id" class="input" placeholder="Ticket ID (UUID)">
+          </div>
+          <div class="grid md:grid-cols-2 gap-3 mt-3">
+            <input id="rv-speed" class="input" type="number" min="0" max="100" placeholder="Hız (SLA) %">
+            <input id="rv-accuracy" class="input" type="number" min="0" max="100" placeholder="Doğruluk %">
+            <input id="rv-procedure" class="input" type="number" min="0" max="100" placeholder="Prosedür %">
+            <input id="rv-clarity" class="input" type="number" min="0" max="100" placeholder="Netlik %">
+            <input id="rv-empathy" class="input" type="number" min="0" max="100" placeholder="Empati %">
+            <input id="rv-completeness" class="input" type="number" min="0" max="100" placeholder="Kapsamlılık %">
+            <input id="rv-ownership" class="input" type="number" min="0" max="100" placeholder="Sahiplenme %">
+            <input id="rv-tools" class="input" type="number" min="0" max="100" placeholder="Araç/Etiket %">
+            <input id="rv-sales" class="input" type="number" min="0" max="100" placeholder="Satış %">
+            <input id="rv-coaching" class="input" type="number" min="0" max="100" placeholder="Koçluk %">
+          </div>
+          <textarea id="rv-notes" class="input mt-3" placeholder="Kanıt/özet/link"></textarea>
+          <button id="rv-submit" class="btn btn-ghost mt-3">Kaydet</button>
+          <p id="rv-msg" class="text-sm mt-1 opacity-90"></p>
+
+          <!-- Operators table -->
+          <h4 class="font-semibold mt-6 mb-2">Operatörler</h4>
+          <div class="overflow-auto">
+            <table id="tbl-ops" class="w-full text-sm">
+              <thead><tr class="text-left opacity-70">
+                <th class="py-2">E-posta</th><th>Rol</th><th>Kayıt</th>
+              </tr></thead><tbody></tbody>
+            </table>
+          </div>
+
+          <!-- KPI table (Admin view) -->
+          <h4 class="font-semibold mt-6 mb-2">Aylık KPI’lar</h4>
+          <div class="overflow-auto">
+            <table id="tbl-kpi" class="w-full text-sm">
+              <thead><tr class="text-left opacity-70">
+                <th class="py-2">Ay</th><th>Operatör</th><th>Ticket</th>
+                <th>FRT Ort. (sn)</th><th>TTR Ort. (sn)</th>
+                <th>FRT %</th><th>TTR %</th><th>Puan Ort.</th>
+              </tr></thead><tbody></tbody>
+            </table>
+          </div>
         </div>
 
-        <div class="grid md:grid-cols-2 gap-4">
-          <button id="btn-refresh" class="btn btn-ghost">Profili Yenile</button>
-          <button id="btn-signout" class="btn btn-ghost">Güvenli Çıkış</button>
+        <!-- OPERATOR VIEW -->
+        <div id="operator-view" class="hidden">
+          <h4 class="font-semibold mb-2">Aylık KPI’larım</h4>
+          <div class="overflow-auto">
+            <table id="tbl-kpi-me" class="w-full text-sm">
+              <thead><tr class="text-left opacity-70">
+                <th class="py-2">Ay</th><th>Ticket</th>
+                <th>FRT Ort. (sn)</th><th>TTR Ort. (sn)</th>
+                <th>FRT %</th><th>TTR %</th><th>Puan Ort.</th>
+              </tr></thead><tbody></tbody>
+            </table>
+          </div>
+
+          <h4 class="font-semibold mt-6 mb-2">Aldığım Puanlar (Son 50)</h4>
+          <div class="overflow-auto">
+            <table id="tbl-my-ratings" class="w-full text-sm">
+              <thead><tr class="text-left opacity-70">
+                <th class="py-2">Tarih</th><th>Ticket</th><th>Toplam</th>
+                <th>Hız</th><th>Doğruluk</th><th>Prosedür</th><th>Netlik</th><th>Empati</th>
+              </tr></thead><tbody></tbody>
+            </table>
+          </div>
         </div>
       </div>
     </section>
   </main>
 
-  <!-- Supabase -->
+  <!-- Supabase SDK -->
   <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
   <script>
-    // === Supabase config (Senin verdiğin değerlerle dolduruldu) ===
+    // ====== Supabase config (senin değerlerin) ======
     const SUPABASE_URL = "https://swsxpdzjxofajjhlqnsl.supabase.co";
     const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN3c3hwZHpqeG9mYWpqaGxxbnNsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTkwNzY1MzUsImV4cCI6MjA3NDY1MjUzNX0.nD4qPHLk35pX7MlirXLNkfSbjdyd4ac5iuzY-hiGL5I";
     const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
       auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true }
     });
 
-    // === UI helpers ===
+    // ====== DOM helpers ======
     const $ = s => document.querySelector(s);
     const show = (el, flag) => el.classList.toggle('hidden', !flag);
-    const setText = (el, txt) => el.textContent = txt ?? '';
+    const setText = (el, txt) => { if(el) el.textContent = txt ?? ''; };
 
     // Tabs
     const tabLogin = $('#tab-login'), tabRegister = $('#tab-register');
@@ -162,122 +253,216 @@
     tabRegister.onclick = () => { tabRegister.classList.remove('opacity-70'); tabLogin.classList.add('opacity-70'); show(formLogin,false); show(formRegister,true); }
 
     // Password toggles
-    $('#toggle-login-pass').onclick = () => {
-      const i = $('#login-password'); i.type = i.type === 'password' ? 'text' : 'password';
-      $('#toggle-login-pass').textContent = i.type === 'password' ? 'Göster' : 'Gizle';
-    };
-    $('#toggle-reg-pass').onclick = () => {
-      const i = $('#reg-password'); i.type = i.type === 'password' ? 'text' : 'password';
-      $('#toggle-reg-pass').textContent = i.type === 'password' ? 'Göster' : 'Gizle';
-    };
+    $('#toggle-login-pass').onclick = () => { const i=$('#login-password'); i.type=i.type==='password'?'text':'password'; $('#toggle-login-pass').textContent=i.type==='password'?'Göster':'Gizle'; };
+    $('#toggle-reg-pass').onclick   = () => { const i=$('#reg-password');   i.type=i.type==='password'?'text':'password';   $('#toggle-reg-pass').textContent=i.type==='password'?'Göster':'Gizle'; };
 
-    // Auth DOM
-    const authCard = $('#auth-card');
-    const app = $('#app');
-    const userChip = $('#user-chip');
-    const chipEmail = $('#chip-email');
-    const chipRole = $('#chip-role');
-    const roleBadge = $('#role-badge');
-    const msgLogin = $('#msg-login');
-    const msgRegister = $('#msg-register');
+    // Auth section elements
+    const authCard = $('#auth-card'), app = $('#app');
+    const userChip = $('#user-chip'), chipEmail = $('#chip-email'), chipRole = $('#chip-role');
+    const roleBadge = $('#role-badge'), msgLogin = $('#msg-login'), msgRegister = $('#msg-register');
 
-    // Load profile
+    // ========= PROFILE / ROLE =========
     async function loadProfile() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
       setText(chipEmail, user.email);
-      $('#profile-email').textContent = user.email;
-      $('#profile-id').textContent = user.id;
-      // get profile row
-      const { data, error } = await supabase.from('profiles')
-        .select('id,email,role,created_at')
-        .eq('id', user.id)
-        .single();
+      setText($('#profile-email'), user.email);
+      setText($('#profile-id'), user.id);
+      const { data, error } = await supabase.from('profiles').select('id,email,role,created_at').eq('id', user.id).single();
       if (error) {
-        chipRole.className = 'badge';
-        chipRole.textContent = 'profil yok';
-        roleBadge.className = 'badge';
-        roleBadge.textContent = 'profil yok';
+        chipRole.className='badge'; chipRole.textContent='profil yok';
+        roleBadge.className='badge'; roleBadge.textContent='profil yok';
         return;
       }
-      const role = (data.role || 'follower');
+      const role = data.role || 'follower';
       const created = new Date(data.created_at).toLocaleString();
-      $('#profile-created').textContent = created;
+      setText($('#profile-created'), created);
 
-      // badges
-      const roleClass = role === 'admin' ? 'badge-admin' : role === 'operator' ? 'badge-operator' : 'badge-follower';
+      const roleClass = role==='admin' ? 'badge-admin' : role==='operator' ? 'badge-operator' : 'badge-follower';
       chipRole.className = `badge ${roleClass}`;
       roleBadge.className = `badge ${roleClass}`;
-      chipRole.textContent = role;
-      roleBadge.textContent = role;
+      chipRole.textContent = role; roleBadge.textContent = role;
 
-      // admin tools
-      show($('#admin-tools'), role === 'admin');
+      show($('#admin-tools'), role==='admin');
+      show($('#operator-view'), role!=='admin'); // operator/follower
+
+      if (role==='admin') { await loadOperators(); await loadSLA(); await loadMonthlyKPIs(); }
+      else { await loadKPIsMe(user.id); await loadMyRatings(user.id); }
     }
 
-    // Login
-    formLogin.addEventListener('submit', async (e) => {
+    // ========= AUTH =========
+    formLogin.addEventListener('submit', async (e)=>{
       e.preventDefault();
       setText(msgLogin, 'Giriş yapılıyor…');
       const email = $('#login-email').value.trim();
       const password = $('#login-password').value;
-      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-      if (error) {
-        if (error.message.includes('Invalid login credentials')) {
-          setText(msgLogin, 'Bilgiler hatalı. Kayıt sekmesinden yeni hesap oluşturabilirsiniz.');
-        } else {
-          setText(msgLogin, 'Giriş hatası: ' + error.message);
-        }
-        return;
-      }
+      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      if (error) { setText(msgLogin, 'Giriş hatası: '+error.message); return; }
       setText(msgLogin, 'Giriş başarılı.');
-      show(authCard, false); show(app, true); show(userChip, true);
+      show(authCard,false); show(app,true); show(userChip,true);
       await loadProfile();
     });
 
-    // Register
-    formRegister.addEventListener('submit', async (e) => {
+    formRegister.addEventListener('submit', async (e)=>{
       e.preventDefault();
       setText(msgRegister, 'Kayıt oluşturuluyor…');
       const email = $('#reg-email').value.trim();
       const password = $('#reg-password').value;
-      const { data, error } = await supabase.auth.signUp({ email, password });
-      if (error) { setText(msgRegister, 'Kayıt hatası: ' + error.message); return; }
-      setText(msgRegister, 'Kayıt başarılı. E-posta doğrulaması gerekebilir. Giriş sekmesinden devam edin.');
+      const { error } = await supabase.auth.signUp({ email, password });
+      if (error) { setText(msgRegister, 'Kayıt hatası: '+error.message); return; }
+      setText(msgRegister, 'Kayıt başarılı. (E-posta doğrulaması açık ise kutunu kontrol et.) Giriş sekmesinden devam et.');
     });
 
-    // Global sign out buttons
-    $('#btn-signout').onclick = $('#btn-logout').onclick = async () => {
-      await supabase.auth.signOut(); location.reload();
-    };
+    $('#btn-logout').onclick = async ()=>{ await supabase.auth.signOut(); location.reload(); };
 
-    // Admin: role assign
-    $('#adm-apply').onclick = async () => {
+    supabase.auth.onAuthStateChange(async (_evt, session)=>{
+      if (session) { show(authCard,false); show(app,true); show(userChip,true); await loadProfile(); }
+    });
+    (async()=>{ const { data:{user} } = await supabase.auth.getUser(); if(user){ show(authCard,false); show(app,true); show(userChip,true); loadProfile(); }})();
+
+    // ========= ADMIN: ROLE ASSIGN =========
+    $('#adm-apply').onclick = async ()=>{
       const email = $('#adm-email').value.trim();
-      const role = $('#adm-role').value;
-      const msg = $('#msg-admin');
-      msg.textContent = 'Uygulanıyor…';
-      // find profile by email
-      const { data: prof, error: e1 } = await supabase.from('profiles').select('id,email').eq('email', email).single();
-      if (e1) { msg.textContent = 'Bulunamadı: ' + e1.message; return; }
-      const { error: e2 } = await supabase.from('profiles').update({ role }).eq('id', prof.id);
-      msg.textContent = e2 ? ('Hata: ' + e2.message) : 'Rol güncellendi ✅';
+      const role  = $('#adm-role').value;
+      const msg = $('#msg-admin'); msg.textContent='Uygulanıyor…';
+      const { data: p, error: e1 } = await supabase.from('profiles').select('id').eq('email', email).single();
+      if (e1||!p){ msg.textContent='Bulunamadı: '+(e1?.message||'profil yok'); return; }
+      const { error: e2 } = await supabase.from('profiles').update({ role }).eq('id', p.id);
+      msg.textContent = e2 ? ('Hata: '+e2.message) : 'Rol güncellendi ✅';
+      if(!e2){ await loadOperators(); }
     };
 
-    // Refresh
-    $('#btn-refresh').onclick = loadProfile;
+    // ========= ADMIN: OPERATORS LIST =========
+    async function loadOperators(){
+      const { data, error } = await supabase.from('profiles')
+        .select('email, role, created_at').order('created_at',{ascending:false}).limit(500);
+      const tbody = document.querySelector('#tbl-ops tbody'); tbody.innerHTML='';
+      (data||[]).forEach(r=>{
+        const tr=document.createElement('tr');
+        tr.innerHTML = `<td class="py-2">${r.email||'-'}</td><td>${r.role}</td><td>${new Date(r.created_at).toLocaleString()}</td>`;
+        tbody.appendChild(tr);
+      });
+    }
 
-    // On page load: session?
-    supabase.auth.onAuthStateChange(async (_event, session) => {
-      if (session) {
-        show(authCard, false); show(app, true); show(userChip, true);
-        await loadProfile();
+    // ========= ADMIN: SLA SETTINGS =========
+    async function loadSLA(){
+      const { data } = await supabase.from('settings_sla').select('*').eq('id',1).single();
+      if (data){ $('#sla-frt').value = data.frt_target_seconds; $('#sla-ttr').value = data.ttr_target_seconds; }
+    }
+    $('#sla-save').onclick = async ()=>{
+      const frt = parseInt($('#sla-frt').value||'300',10);
+      const ttr = parseInt($('#sla-ttr').value||'86400',10);
+      const { error } = await supabase.from('settings_sla').upsert({ id:1, frt_target_seconds:frt, ttr_target_seconds:ttr });
+      $('#msg-sla').textContent = error?('Hata: '+error.message):'SLA güncellendi ✅';
+      await loadMonthlyKPIs();
+    };
+
+    // ========= ADMIN: QUICK TICKET CREATE =========
+    $('#tc-create').onclick = async ()=>{
+      const msg = $('#msg-ticket'); msg.textContent='Oluşturuluyor…';
+      const email = $('#tc-operator-email').value.trim();
+      const { data: op } = await supabase.from('profiles').select('id').eq('email', email).single();
+      if(!op){ msg.textContent='Operatör bulunamadı'; return; }
+      const status = $('#tc-status').value;
+      const channel = $('#tc-channel').value||'livechat';
+      const tags = ($('#tc-tags').value||'').split(',').map(s=>s.trim()).filter(Boolean);
+      const now = new Date();
+      const frtAt = new Date(now.getTime()+2*60*1000).toISOString(); // örnek: 2 dk
+      const resAt = new Date(now.getTime()+60*60*1000).toISOString(); // örnek: 1 saat
+      const payload = {
+        operator_id: op.id, channel, tags, status,
+        created_at: now.toISOString(),
+        first_reply_at: frtAt, resolved_at: status==='resolved'||status==='closed'? resAt : null
+      };
+      const { error } = await supabase.from('tickets').insert(payload);
+      msg.textContent = error?('Hata: '+error.message):'Ticket oluşturuldu ✅';
+      if(!error){ await loadMonthlyKPIs(); }
+    };
+
+    // ========= ADMIN: RATE (BAREM) =========
+    $('#rv-submit').onclick = async ()=>{
+      const msg = $('#rv-msg'); msg.textContent='Kaydediliyor…';
+      const opEmail = $('#rv-operator-email').value.trim();
+      const { data: op } = await supabase.from('profiles').select('id').eq('email', opEmail).single();
+      if(!op){ msg.textContent='Operatör bulunamadı'; return; }
+      const { data:{user:me} } = await supabase.auth.getUser();
+      const payload = {
+        ticket_id: $('#rv-ticket-id').value.trim() || null,
+        operator_id: op.id, rater_id: me.id,
+        speed:+($('#rv-speed').value||0), accuracy:+($('#rv-accuracy').value||0),
+        procedure:+($('#rv-procedure').value||0), clarity:+($('#rv-clarity').value||0),
+        empathy:+($('#rv-empathy').value||0), completeness:+($('#rv-completeness').value||0),
+        ownership:+($('#rv-ownership').value||0), tools:+($('#rv-tools').value||0),
+        sales:+($('#rv-sales').value||0), coaching:+($('#rv-coaching').value||0),
+        notes: $('#rv-notes').value||null
+      };
+      const { error } = await supabase.from('ratings').insert(payload);
+      msg.textContent = error?('Hata: '+error.message):'Puan kaydedildi ✅';
+      if(!error){ await loadMonthlyKPIs(); }
+    };
+
+    // ========= ADMIN: KPI MONTHLY =========
+    async function loadMonthlyKPIs(){
+      const since = new Date(); since.setMonth(since.getMonth()-3);
+      const { data, error } = await supabase.from('operator_kpis_month')
+        .select('*').gte('month', since.toISOString().slice(0,10)).order('month',{ascending:false});
+      const tbody = document.querySelector('#tbl-kpi tbody'); tbody.innerHTML='';
+      for (const r of (data||[])) {
+        const { data: p } = await supabase.from('profiles').select('email').eq('id', r.operator_id).single();
+        const tr=document.createElement('tr');
+        tr.innerHTML = `
+          <td class="py-2">${new Date(r.month).toLocaleDateString('tr-TR',{year:'numeric',month:'2-digit'})}</td>
+          <td>${p?.email||r.operator_id.slice(0,8)}</td>
+          <td>${r.ticket_count||0}</td>
+          <td>${r.avg_frt_seconds?Math.round(r.avg_frt_seconds):'-'}</td>
+          <td>${r.avg_ttr_seconds?Math.round(r.avg_ttr_seconds):'-'}</td>
+          <td>${r.frt_meet_pct?Math.round(r.frt_meet_pct):0}%</td>
+          <td>${r.ttr_meet_pct?Math.round(r.ttr_meet_pct):0}%</td>
+          <td>${r.avg_total_score?Math.round(r.avg_total_score):'-'}</td>`;
+        tbody.appendChild(tr);
       }
-    });
-    (async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user) { show(authCard, false); show(app, true); show(userChip, true); loadProfile(); }
-    })();
+    }
+
+    // ========= OPERATOR: MY KPI & RATINGS =========
+    async function loadKPIsMe(operatorId){
+      const since = new Date(); since.setMonth(since.getMonth()-3);
+      const { data } = await supabase.from('operator_kpis_month')
+        .select('*').eq('operator_id', operatorId)
+        .gte('month', since.toISOString().slice(0,10))
+        .order('month',{ascending:false});
+      const tbody = document.querySelector('#tbl-kpi-me tbody'); tbody.innerHTML='';
+      (data||[]).forEach(r=>{
+        const tr=document.createElement('tr');
+        tr.innerHTML = `
+          <td class="py-2">${new Date(r.month).toLocaleDateString('tr-TR',{year:'numeric',month:'2-digit'})}</td>
+          <td>${r.ticket_count||0}</td>
+          <td>${r.avg_frt_seconds?Math.round(r.avg_frt_seconds):'-'}</td>
+          <td>${r.avg_ttr_seconds?Math.round(r.avg_ttr_seconds):'-'}</td>
+          <td>${r.frt_meet_pct?Math.round(r.frt_meet_pct):0}%</td>
+          <td>${r.ttr_meet_pct?Math.round(r.ttr_meet_pct):0}%</td>
+          <td>${r.avg_total_score?Math.round(r.avg_total_score):'-'}</td>`;
+        tbody.appendChild(tr);
+      });
+    }
+    async function loadMyRatings(operatorId){
+      const { data } = await supabase.from('ratings')
+        .select('created_at,ticket_id,total_score,speed,accuracy,procedure,clarity,empathy')
+        .eq('operator_id', operatorId).order('created_at',{ascending:false}).limit(50);
+      const tbody = document.querySelector('#tbl-my-ratings tbody'); tbody.innerHTML='';
+      (data||[]).forEach(r=>{
+        const tr=document.createElement('tr');
+        tr.innerHTML = `
+          <td class="py-2">${new Date(r.created_at).toLocaleString()}</td>
+          <td>${r.ticket_id||'-'}</td>
+          <td>${r.total_score??'-'}</td>
+          <td>${r.speed??'-'}</td>
+          <td>${r.accuracy??'-'}</td>
+          <td>${r.procedure??'-'}</td>
+          <td>${r.clarity??'-'}</td>
+          <td>${r.empathy??'-'}</td>`;
+        tbody.appendChild(tr);
+      });
+    }
   </script>
 </body>
 </html>
