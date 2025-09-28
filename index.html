@@ -8,32 +8,29 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
-    :root { color-scheme: dark }
+    :root{color-scheme:dark}
     html,body{height:100%}
     body{
-      margin:0; font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial;
+      margin:0;font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial;
       background:
         radial-gradient(1200px 600px at 10% -10%, rgba(37,255,230,.08), transparent 60%),
         radial-gradient(900px 500px at 100% 0%, rgba(13,197,255,.08), transparent 50%),
-        #0a0f1e;
-      color:#e9eef5
+        #0a0f1e; color:#e9eef5
     }
-    .card{background:#0f172a; border:1px solid #1f2a44; border-radius:16px; box-shadow:0 12px 36px rgba(0,0,0,.35)}
-    .input{background:#0b1430; border:1px solid #243055; border-radius:12px; padding:.9rem 1rem; width:100%}
-    .input:focus{outline:2px solid #0DC5FF; border-color:#0DC5FF}
-    .btn{padding:.85rem 1rem; border-radius:12px; font-weight:700}
+    .card{background:#0f172a;border:1px solid #1f2a44;border-radius:16px;box-shadow:0 12px 36px rgba(0,0,0,.35)}
+    .input{background:#0b1430;border:1px solid #243055;border-radius:12px;padding:.9rem 1rem;width:100%}
+    .input:focus{outline:2px solid #0DC5FF;border-color:#0DC5FF}
+    .btn{padding:.85rem 1rem;border-radius:12px;font-weight:700}
     .btn-primary{background:#0DC5FF}
     .btn-ghost{border:1px solid #2a3658}
-    .badge{padding:.25rem .55rem; border-radius:.5rem; font-size:.75rem; font-weight:700; border:1px solid rgba(255,255,255,.12)}
-    .badge-admin{background:rgba(255,193,7,.12); color:#ffc107}
-    .badge-operator{background:rgba(13,197,255,.12); color:#0DC5FF}
-    .badge-follower{background:rgba(37,255,230,.12); color:#25FFE6}
+    .badge{padding:.25rem .55rem;border-radius:.5rem;font-size:.75rem;font-weight:700;border:1px solid rgba(255,255,255,.12)}
+    .badge-admin{background:rgba(255,193,7,.12);color:#ffc107}
+    .badge-operator{background:rgba(13,197,255,.12);color:#0DC5FF}
+    .badge-follower{background:rgba(37,255,230,.12);color:#25FFE6}
     table thead th{font-weight:600}
-    table td, table th{padding:.5rem .25rem}
   </style>
 </head>
 <body>
-  <!-- Header -->
   <header class="border-b border-[#1f2a44]">
     <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
       <div class="flex items-center gap-3">
@@ -51,8 +48,8 @@
     </div>
   </header>
 
-  <!-- Auth -->
   <main class="max-w-7xl mx-auto px-6 py-10">
+    <!-- Auth -->
     <div id="auth-card" class="card p-8 max-w-xl mx-auto">
       <div class="flex gap-2 mb-6">
         <button id="tab-login" class="btn btn-ghost w-1/2 font-semibold">Giriş Yap</button>
@@ -95,7 +92,7 @@
 
     <!-- App -->
     <section id="app" class="hidden grid lg:grid-cols-3 gap-6">
-      <!-- Profile -->
+      <!-- Profil -->
       <div class="card p-6 lg:col-span-1">
         <div class="flex items-start justify-between">
           <div>
@@ -114,15 +111,14 @@
         </div>
       </div>
 
-      <!-- Admin/Operator Workspace -->
+      <!-- İş Alanı -->
       <div class="card p-6 lg:col-span-2">
         <h3 class="text-xl font-bold mb-2">İş Alanı</h3>
         <p class="text-sm opacity-70 mb-4">Admin isen alttaki araçlar aktif olur. Operatörsen kendi KPI’larını görürsün.</p>
 
         <!-- ADMIN TOOLS -->
         <div id="admin-tools" class="hidden">
-          <!-- Role assign -->
-          <h4 class="font-semibold mb-2">Admin: Rol Atama</h4>
+          <h4 class="font-semibold mb-2">Rol Atama</h4>
           <div class="grid md:grid-cols-[1fr_180px_120px] gap-3">
             <input id="adm-email" type="email" placeholder="kisi@ornek.com" class="input">
             <select id="adm-role" class="input">
@@ -134,8 +130,7 @@
           </div>
           <p id="msg-admin" class="text-sm opacity-90 mt-2"></p>
 
-          <!-- SLA settings -->
-          <h4 class="font-semibold mt-6 mb-2">SLA Hedefleri (FRT/TTR)</h4>
+          <h4 class="font-semibold mt-6 mb-2">SLA (FRT/TTR)</h4>
           <div class="grid md:grid-cols-[1fr_1fr_120px] gap-3">
             <input id="sla-frt" type="number" class="input" placeholder="FRT hedefi (sn)">
             <input id="sla-ttr" type="number" class="input" placeholder="TTR hedefi (sn)">
@@ -143,8 +138,7 @@
           </div>
           <p id="msg-sla" class="text-sm opacity-90 mt-2"></p>
 
-          <!-- Quick ticket create -->
-          <h4 class="font-semibold mt-6 mb-2">Ticket Oluştur (Hızlı Test)</h4>
+          <h4 class="font-semibold mt-6 mb-2">Ticket Oluştur (Test)</h4>
           <div class="grid md:grid-cols-2 gap-3">
             <input id="tc-operator-email" class="input" placeholder="Operatör e-postası">
             <select id="tc-status" class="input">
@@ -159,7 +153,6 @@
           </div>
           <p id="msg-ticket" class="text-sm opacity-90 mt-2"></p>
 
-          <!-- Rate form -->
           <h4 class="font-semibold mt-6 mb-2">Puan Ver (Baremli)</h4>
           <div class="grid md:grid-cols-2 gap-3">
             <input id="rv-operator-email" class="input" placeholder="Operatör e-postası">
@@ -181,7 +174,6 @@
           <button id="rv-submit" class="btn btn-ghost mt-3">Kaydet</button>
           <p id="rv-msg" class="text-sm mt-1 opacity-90"></p>
 
-          <!-- Operators table -->
           <h4 class="font-semibold mt-6 mb-2">Operatörler</h4>
           <div class="overflow-auto">
             <table id="tbl-ops" class="w-full text-sm">
@@ -191,7 +183,6 @@
             </table>
           </div>
 
-          <!-- KPI table (Admin view) -->
           <h4 class="font-semibold mt-6 mb-2">Aylık KPI’lar</h4>
           <div class="overflow-auto">
             <table id="tbl-kpi" class="w-full text-sm">
@@ -231,162 +222,158 @@
     </section>
   </main>
 
-  <!-- Supabase SDK -->
   <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
   <script>
-    // ====== Supabase config (senin değerlerin) ======
+    // ===== Supabase config (senin değerlerin) =====
     const SUPABASE_URL = "https://swsxpdzjxofajjhlqnsl.supabase.co";
     const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN3c3hwZHpqeG9mYWpqaGxxbnNsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTkwNzY1MzUsImV4cCI6MjA3NDY1MjUzNX0.nD4qPHLk35pX7MlirXLNkfSbjdyd4ac5iuzY-hiGL5I";
+    const PROJECT_REF = "swsxpdzjxofajjhlqnsl";
     const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
       auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true }
     });
 
-    // ====== DOM helpers ======
+    // Helpers
     const $ = s => document.querySelector(s);
-    const show = (el, flag) => el.classList.toggle('hidden', !flag);
-    const setText = (el, txt) => { if(el) el.textContent = txt ?? ''; };
+    const show = (el, v) => el.classList.toggle('hidden', !v);
+    const setText = (el, t) => { if (el) el.textContent = t ?? ''; };
 
     // Tabs
-    const tabLogin = $('#tab-login'), tabRegister = $('#tab-register');
-    const formLogin = $('#form-login'), formRegister = $('#form-register');
-    tabLogin.onclick = () => { tabLogin.classList.remove('opacity-70'); tabRegister.classList.add('opacity-70'); show(formLogin,true); show(formRegister,false); }
-    tabRegister.onclick = () => { tabRegister.classList.remove('opacity-70'); tabLogin.classList.add('opacity-70'); show(formLogin,false); show(formRegister,true); }
+    $('#tab-login').onclick = ()=>{ $('#tab-login').classList.remove('opacity-70'); $('#tab-register').classList.add('opacity-70'); show($('#form-login'),true); show($('#form-register'),false); };
+    $('#tab-register').onclick = ()=>{ $('#tab-register').classList.remove('opacity-70'); $('#tab-login').classList.add('opacity-70'); show($('#form-login'),false); show($('#form-register'),true); };
+    $('#toggle-login-pass').onclick = ()=>{ const i=$('#login-password'); i.type=i.type==='password'?'text':'password'; $('#toggle-login-pass').textContent=i.type==='password'?'Göster':'Gizle'; };
+    $('#toggle-reg-pass').onclick   = ()=>{ const i=$('#reg-password');   i.type=i.type==='password'?'text':'password';   $('#toggle-reg-pass').textContent=i.type==='password'?'Göster':'Gizle'; };
 
-    // Password toggles
-    $('#toggle-login-pass').onclick = () => { const i=$('#login-password'); i.type=i.type==='password'?'text':'password'; $('#toggle-login-pass').textContent=i.type==='password'?'Göster':'Gizle'; };
-    $('#toggle-reg-pass').onclick   = () => { const i=$('#reg-password');   i.type=i.type==='password'?'text':'password';   $('#toggle-reg-pass').textContent=i.type==='password'?'Göster':'Gizle'; };
-
-    // Auth section elements
-    const authCard = $('#auth-card'), app = $('#app');
-    const userChip = $('#user-chip'), chipEmail = $('#chip-email'), chipRole = $('#chip-role');
-    const roleBadge = $('#role-badge'), msgLogin = $('#msg-login'), msgRegister = $('#msg-register');
-
-    // ========= PROFILE / ROLE =========
-    async function loadProfile() {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
-      setText(chipEmail, user.email);
-      setText($('#profile-email'), user.email);
-      setText($('#profile-id'), user.id);
-      const { data, error } = await supabase.from('profiles').select('id,email,role,created_at').eq('id', user.id).single();
-      if (error) {
-        chipRole.className='badge'; chipRole.textContent='profil yok';
-        roleBadge.className='badge'; roleBadge.textContent='profil yok';
-        return;
-      }
-      const role = data.role || 'follower';
-      const created = new Date(data.created_at).toLocaleString();
-      setText($('#profile-created'), created);
-
-      const roleClass = role==='admin' ? 'badge-admin' : role==='operator' ? 'badge-operator' : 'badge-follower';
-      chipRole.className = `badge ${roleClass}`;
-      roleBadge.className = `badge ${roleClass}`;
-      chipRole.textContent = role; roleBadge.textContent = role;
-
-      show($('#admin-tools'), role==='admin');
-      show($('#operator-view'), role!=='admin'); // operator/follower
-
-      if (role==='admin') { await loadOperators(); await loadSLA(); await loadMonthlyKPIs(); }
-      else { await loadKPIsMe(user.id); await loadMyRatings(user.id); }
-    }
-
-    // ========= AUTH =========
-    formLogin.addEventListener('submit', async (e)=>{
+    // Auth
+    $('#form-login').addEventListener('submit', async (e)=>{
       e.preventDefault();
-      setText(msgLogin, 'Giriş yapılıyor…');
-      const email = $('#login-email').value.trim();
-      const password = $('#login-password').value;
+      setText($('#msg-login'),'Giriş yapılıyor…');
+      const email=$('#login-email').value.trim(), password=$('#login-password').value;
       const { error } = await supabase.auth.signInWithPassword({ email, password });
-      if (error) { setText(msgLogin, 'Giriş hatası: '+error.message); return; }
-      setText(msgLogin, 'Giriş başarılı.');
-      show(authCard,false); show(app,true); show(userChip,true);
+      if (error){ setText($('#msg-login'),'Giriş hatası: '+error.message); return; }
+      setText($('#msg-login'),'Giriş başarılı.');
+      show($('#auth-card'),false); show($('#app'),true); show($('#user-chip'),true);
       await loadProfile();
     });
 
-    formRegister.addEventListener('submit', async (e)=>{
+    $('#form-register').addEventListener('submit', async (e)=>{
       e.preventDefault();
-      setText(msgRegister, 'Kayıt oluşturuluyor…');
-      const email = $('#reg-email').value.trim();
-      const password = $('#reg-password').value;
+      setText($('#msg-register'),'Kayıt oluşturuluyor…');
+      const email=$('#reg-email').value.trim(), password=$('#reg-password').value;
       const { error } = await supabase.auth.signUp({ email, password });
-      if (error) { setText(msgRegister, 'Kayıt hatası: '+error.message); return; }
-      setText(msgRegister, 'Kayıt başarılı. (E-posta doğrulaması açık ise kutunu kontrol et.) Giriş sekmesinden devam et.');
+      setText($('#msg-register'), error ? ('Kayıt hatası: '+error.message) : 'Kayıt başarılı. Giriş sekmesinden devam et.');
     });
 
-    $('#btn-logout').onclick = async ()=>{ await supabase.auth.signOut(); location.reload(); };
+    // Logout (fix: localStorage temizliği + tam yenile)
+    function bindLogout() {
+      const btns = ['#btn-logout'].map(s=>$(s)).filter(Boolean);
+      btns.forEach(btn => btn.addEventListener('click', async (e)=>{
+        e.preventDefault();
+        try { await supabase.auth.signOut(); } catch(e){}
+        try {
+          localStorage.removeItem(`sb-${PROJECT_REF}-auth-token`);
+          Object.keys(localStorage).forEach(k=>{ if(k.startsWith(`sb-${PROJECT_REF}-`)) localStorage.removeItem(k); });
+        } catch(e){}
+        location.href = location.origin + location.pathname;
+      }));
+    }
+    bindLogout();
 
-    supabase.auth.onAuthStateChange(async (_evt, session)=>{
-      if (session) { show(authCard,false); show(app,true); show(userChip,true); await loadProfile(); }
+    // UI refs
+    const authCard=$('#auth-card'), app=$('#app'), userChip=$('#user-chip');
+    const chipEmail=$('#chip-email'), chipRole=$('#chip-role'), roleBadge=$('#role-badge');
+
+    async function loadProfile(){
+      const { data:{ user } } = await supabase.auth.getUser();
+      if(!user) return;
+      setText(chipEmail, user.email);
+      setText($('#profile-email'), user.email);
+      setText($('#profile-id'), user.id);
+
+      const { data, error } = await supabase.from('profiles').select('id,email,role,created_at').eq('id', user.id).single();
+      if (error || !data){ chipRole.textContent='profil yok'; roleBadge.textContent='profil yok'; return; }
+
+      const role = data.role || 'follower';
+      setText($('#profile-created'), new Date(data.created_at).toLocaleString());
+      const cls = role==='admin'?'badge-admin':role==='operator'?'badge-operator':'badge-follower';
+      chipRole.className = `badge ${cls}`; roleBadge.className = `badge ${cls}`;
+      chipRole.textContent = role; roleBadge.textContent = role;
+
+      // Paneller
+      show($('#admin-tools'), role==='admin');
+      show($('#operator-view'), role!=='admin');
+
+      if (role==='admin'){ await loadOperators(); await loadSLA(); await loadMonthlyKPIs(); }
+      else { await loadKPIsMe(user.id); await loadMyRatings(user.id); }
+    }
+
+    // Session değişiminde
+    supabase.auth.onAuthStateChange(async (_e, session)=>{
+      if (session){ show(authCard,false); show(app,true); show(userChip,true); await loadProfile(); }
     });
-    (async()=>{ const { data:{user} } = await supabase.auth.getUser(); if(user){ show(authCard,false); show(app,true); show(userChip,true); loadProfile(); }})();
+    (async()=>{ const { data:{user} } = await supabase.auth.getUser(); if(user){ show(authCard,false); show(app,true); show(userChip,true); await loadProfile(); } })();
 
-    // ========= ADMIN: ROLE ASSIGN =========
+    // Admin: rol atama
     $('#adm-apply').onclick = async ()=>{
-      const email = $('#adm-email').value.trim();
-      const role  = $('#adm-role').value;
-      const msg = $('#msg-admin'); msg.textContent='Uygulanıyor…';
-      const { data: p, error: e1 } = await supabase.from('profiles').select('id').eq('email', email).single();
-      if (e1||!p){ msg.textContent='Bulunamadı: '+(e1?.message||'profil yok'); return; }
-      const { error: e2 } = await supabase.from('profiles').update({ role }).eq('id', p.id);
-      msg.textContent = e2 ? ('Hata: '+e2.message) : 'Rol güncellendi ✅';
-      if(!e2){ await loadOperators(); }
+      const email=$('#adm-email').value.trim(), role=$('#adm-role').value, m=$('#msg-admin');
+      m.textContent='Uygulanıyor…';
+      const { data:p, error:e1 } = await supabase.from('profiles').select('id').eq('email', email).single();
+      if (e1||!p){ m.textContent='Bulunamadı: '+(e1?.message||'profil yok'); return; }
+      const { error:e2 } = await supabase.from('profiles').update({ role }).eq('id', p.id);
+      m.textContent = e2 ? ('Hata: '+e2.message) : 'Rol güncellendi ✅';
+      if(!e2) await loadOperators();
     };
 
-    // ========= ADMIN: OPERATORS LIST =========
+    // Admin: operatör listesi
     async function loadOperators(){
-      const { data, error } = await supabase.from('profiles')
-        .select('email, role, created_at').order('created_at',{ascending:false}).limit(500);
+      const { data } = await supabase.from('profiles').select('email,role,created_at').order('created_at',{ascending:false}).limit(500);
       const tbody = document.querySelector('#tbl-ops tbody'); tbody.innerHTML='';
       (data||[]).forEach(r=>{
         const tr=document.createElement('tr');
-        tr.innerHTML = `<td class="py-2">${r.email||'-'}</td><td>${r.role}</td><td>${new Date(r.created_at).toLocaleString()}</td>`;
+        tr.innerHTML = `<td class="py-2">${r.email||'-'}</td><td>${r.role||'-'}</td><td>${new Date(r.created_at).toLocaleString()}</td>`;
         tbody.appendChild(tr);
       });
     }
 
-    // ========= ADMIN: SLA SETTINGS =========
+    // Admin: SLA
     async function loadSLA(){
       const { data } = await supabase.from('settings_sla').select('*').eq('id',1).single();
-      if (data){ $('#sla-frt').value = data.frt_target_seconds; $('#sla-ttr').value = data.ttr_target_seconds; }
+      if (data){ $('#sla-frt').value=data.frt_target_seconds; $('#sla-ttr').value=data.ttr_target_seconds; }
     }
     $('#sla-save').onclick = async ()=>{
-      const frt = parseInt($('#sla-frt').value||'300',10);
-      const ttr = parseInt($('#sla-ttr').value||'86400',10);
+      const frt=parseInt($('#sla-frt').value||'300',10), ttr=parseInt($('#sla-ttr').value||'86400',10);
       const { error } = await supabase.from('settings_sla').upsert({ id:1, frt_target_seconds:frt, ttr_target_seconds:ttr });
-      $('#msg-sla').textContent = error?('Hata: '+error.message):'SLA güncellendi ✅';
-      await loadMonthlyKPIs();
+      $('#msg-sla').textContent = error ? ('Hata: '+error.message) : 'SLA güncellendi ✅';
+      if(!error) await loadMonthlyKPIs();
     };
 
-    // ========= ADMIN: QUICK TICKET CREATE =========
+    // Admin: Hızlı ticket
     $('#tc-create').onclick = async ()=>{
-      const msg = $('#msg-ticket'); msg.textContent='Oluşturuluyor…';
-      const email = $('#tc-operator-email').value.trim();
-      const { data: op } = await supabase.from('profiles').select('id').eq('email', email).single();
-      if(!op){ msg.textContent='Operatör bulunamadı'; return; }
-      const status = $('#tc-status').value;
-      const channel = $('#tc-channel').value||'livechat';
-      const tags = ($('#tc-tags').value||'').split(',').map(s=>s.trim()).filter(Boolean);
-      const now = new Date();
-      const frtAt = new Date(now.getTime()+2*60*1000).toISOString(); // örnek: 2 dk
-      const resAt = new Date(now.getTime()+60*60*1000).toISOString(); // örnek: 1 saat
-      const payload = {
-        operator_id: op.id, channel, tags, status,
+      const msg=$('#msg-ticket'); msg.textContent='Oluşturuluyor…';
+      const email=$('#tc-operator-email').value.trim();
+      const { data:op } = await supabase.from('profiles').select('id').eq('email', email).single();
+      if (!op){ msg.textContent='Operatör bulunamadı'; return; }
+      const status=$('#tc-status').value, channel=$('#tc-channel').value||'livechat';
+      const tags=($('#tc-tags').value||'').split(',').map(s=>s.trim()).filter(Boolean);
+      const now=new Date();
+      const payload={
+        operator_id:op.id, channel, tags, status,
         created_at: now.toISOString(),
-        first_reply_at: frtAt, resolved_at: status==='resolved'||status==='closed'? resAt : null
+        first_reply_at: new Date(now.getTime()+2*60*1000).toISOString(),
+        resolved_at: (status==='resolved'||status==='closed') ? new Date(now.getTime()+60*60*1000).toISOString() : null
       };
       const { error } = await supabase.from('tickets').insert(payload);
-      msg.textContent = error?('Hata: '+error.message):'Ticket oluşturuldu ✅';
-      if(!error){ await loadMonthlyKPIs(); }
+      msg.textContent = error ? ('Hata: '+error.message) : 'Ticket oluşturuldu ✅';
+      if(!error) await loadMonthlyKPIs();
     };
 
-    // ========= ADMIN: RATE (BAREM) =========
+    // Admin: Puan verme
     $('#rv-submit').onclick = async ()=>{
-      const msg = $('#rv-msg'); msg.textContent='Kaydediliyor…';
-      const opEmail = $('#rv-operator-email').value.trim();
-      const { data: op } = await supabase.from('profiles').select('id').eq('email', opEmail).single();
-      if(!op){ msg.textContent='Operatör bulunamadı'; return; }
+      const msg=$('#rv-msg'); msg.textContent='Kaydediliyor…';
+      const opEmail=$('#rv-operator-email').value.trim();
+      const { data:op } = await supabase.from('profiles').select('id').eq('email', opEmail).single();
+      if (!op){ msg.textContent='Operatör bulunamadı'; return; }
       const { data:{user:me} } = await supabase.auth.getUser();
-      const payload = {
+      const payload={
         ticket_id: $('#rv-ticket-id').value.trim() || null,
         operator_id: op.id, rater_id: me.id,
         speed:+($('#rv-speed').value||0), accuracy:+($('#rv-accuracy').value||0),
@@ -397,18 +384,18 @@
         notes: $('#rv-notes').value||null
       };
       const { error } = await supabase.from('ratings').insert(payload);
-      msg.textContent = error?('Hata: '+error.message):'Puan kaydedildi ✅';
-      if(!error){ await loadMonthlyKPIs(); }
+      msg.textContent = error ? ('Hata: '+error.message) : 'Puan kaydedildi ✅';
+      if(!error) await loadMonthlyKPIs();
     };
 
-    // ========= ADMIN: KPI MONTHLY =========
+    // Admin: KPI (aylık)
     async function loadMonthlyKPIs(){
-      const since = new Date(); since.setMonth(since.getMonth()-3);
-      const { data, error } = await supabase.from('operator_kpis_month')
+      const since=new Date(); since.setMonth(since.getMonth()-3);
+      const { data } = await supabase.from('operator_kpis_month')
         .select('*').gte('month', since.toISOString().slice(0,10)).order('month',{ascending:false});
-      const tbody = document.querySelector('#tbl-kpi tbody'); tbody.innerHTML='';
-      for (const r of (data||[])) {
-        const { data: p } = await supabase.from('profiles').select('email').eq('id', r.operator_id).single();
+      const tbody=document.querySelector('#tbl-kpi tbody'); tbody.innerHTML='';
+      for (const r of (data||[])){
+        const { data:p } = await supabase.from('profiles').select('email').eq('id', r.operator_id).single();
         const tr=document.createElement('tr');
         tr.innerHTML = `
           <td class="py-2">${new Date(r.month).toLocaleDateString('tr-TR',{year:'numeric',month:'2-digit'})}</td>
@@ -423,14 +410,12 @@
       }
     }
 
-    // ========= OPERATOR: MY KPI & RATINGS =========
+    // Operator: kendi görünümü
     async function loadKPIsMe(operatorId){
-      const since = new Date(); since.setMonth(since.getMonth()-3);
+      const since=new Date(); since.setMonth(since.getMonth()-3);
       const { data } = await supabase.from('operator_kpis_month')
-        .select('*').eq('operator_id', operatorId)
-        .gte('month', since.toISOString().slice(0,10))
-        .order('month',{ascending:false});
-      const tbody = document.querySelector('#tbl-kpi-me tbody'); tbody.innerHTML='';
+        .select('*').eq('operator_id', operatorId).gte('month', since.toISOString().slice(0,10)).order('month',{ascending:false});
+      const tbody=document.querySelector('#tbl-kpi-me tbody'); tbody.innerHTML='';
       (data||[]).forEach(r=>{
         const tr=document.createElement('tr');
         tr.innerHTML = `
@@ -448,7 +433,7 @@
       const { data } = await supabase.from('ratings')
         .select('created_at,ticket_id,total_score,speed,accuracy,procedure,clarity,empathy')
         .eq('operator_id', operatorId).order('created_at',{ascending:false}).limit(50);
-      const tbody = document.querySelector('#tbl-my-ratings tbody'); tbody.innerHTML='';
+      const tbody=document.querySelector('#tbl-my-ratings tbody'); tbody.innerHTML='';
       (data||[]).forEach(r=>{
         const tr=document.createElement('tr');
         tr.innerHTML = `
